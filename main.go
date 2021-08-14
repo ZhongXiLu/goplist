@@ -6,11 +6,15 @@ import (
     "os/signal"
     "syscall"
     "time"
+
+    "github.com/zhongxilu/plist/internal"
 )
 
-var refreshRate int
-var verbose bool
-var outputFile string
+var (
+    refreshRate int
+    verbose     bool
+    outputFile  string
+)
 
 func main() {
     // CLI arguments
@@ -26,17 +30,17 @@ func main() {
     signal.Notify(c, os.Interrupt, syscall.SIGTERM)
     go func() {
         <-c
-        writePreferencesToFile(outputFile, newSettings)
+        internal.WritePreferencesToFile(outputFile, newSettings)
         // TODO: rm -rf prefs dirs
         os.Exit(0)
     }()
 
     // Diff settings every x seconds and look for changes in the plist files
     // If any are found, convert them to bash commands and save them in `newSettings`
-    oldPrefs := savePreferences("oldPrefs")
+    oldPrefs := internal.SavePreferences("oldPrefs")
     for range time.Tick(time.Duration(refreshRate) * time.Second) {
-        newPrefs := savePreferences("newPrefs")
-        diffPreferences(oldPrefs, newPrefs, newSettings)
-        movePreferences(newPrefs, oldPrefs)
+        newPrefs := internal.SavePreferences("newPrefs")
+        internal.DiffPreferences(oldPrefs, newPrefs, newSettings, verbose)
+        internal.MovePreferences(newPrefs, oldPrefs)
     }
 }
