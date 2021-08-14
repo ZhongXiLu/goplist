@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "log"
+    "os"
     "os/exec"
 )
 
@@ -25,5 +26,20 @@ func movePreferences(sourceDir string, targetDir string) {
     cmd = exec.Command("mv", sourceDir, targetDir)
     if out, err := cmd.CombinedOutput(); err != nil {
         log.Fatalf(string(out))
+    }
+}
+
+// Write preferences to a file.
+func writePreferencesToFile(fileName string, settings map[string]string) {
+    // overwrite if file already exists
+    file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+    if err != nil {
+        log.Fatalln(err)
+    }
+    for _, command := range settings {
+        file.WriteString(command + "\n")
+    }
+    if err := file.Close(); err != nil {
+        log.Fatalln(err)
     }
 }

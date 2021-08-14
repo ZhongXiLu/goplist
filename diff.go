@@ -9,12 +9,11 @@ import (
 )
 
 // Plist files we should ignore
-var blackList = map[string]bool{
-    "com.apple.systempreferences.plist": true,
-    "ContextStoreAgent.plist":           true,
-    "com.apple.spaces.plist":            true,
-    "ByHost":                            true,
-    "com.apple.xpc.activity2.plist":     true,
+var blackList = map[string]struct{}{
+    "ByHost":                            {},
+    "com.apple.systempreferences.plist": {},
+    "com.apple.spaces.plist":            {},
+    "jetbrains.jetprofile.asset.plist":  {},
 }
 
 // Get the bash command that outputs the equivalent xml representation of a plist file.
@@ -35,8 +34,20 @@ func getValueOfTag(line string) string {
         if len(matches) == 2 {
             return matches[1]
         } else {
-            log.Fatalf("Could not parse %s", line)
+            if verbose {
+                log.Println("Could not parse %s", line)
+            }
         }
+    }
+    return ""
+}
+
+// Get the name of the tag.
+func getTagName(line string) string {
+    regex := regexp.MustCompile(`<(.*?)>`)
+    matches := regex.FindStringSubmatch(line)
+    if len(matches) == 2 {
+        return matches[1]
     }
     return ""
 }
@@ -55,13 +66,39 @@ func diffPlistFile(oldPlist string, newPlist string, newSettings map[string]stri
         for index, diff := range lines {
             if strings.HasPrefix(diff, "+") && !strings.HasPrefix(diff, "+++") {
                 // found diff line
-                key := getValueOfTag(lines[index-2]) // name of key is located two lines before
+                var key string
+                if getTagName(diff) == "date" {
+                    continue
+                }
+                if strings.HasPrefix(lines[index-1], "+") {
+                    // name of key is located one line before
+                    // +       <key>AppleInterfaceStyle</key>
+                    // +       <string>Dark</string>
+                    key = getValueOfTag(lines[index-2])
+                } else {
+                    // name of key is located two lines before
+                    //         <key>autohide</key>
+                    // -       <false/>
+                    // +       <true/>
+                    key = getValueOfTag(lines[index-2])
+                }
                 value := getValueOfTag(diff)
 
-                originalPlist := fmt.Sprintf("$HOME/Library/Preferences/%s", oldPlist[14:])
-                command := fmt.Sprintf("defaults write %s %s %s", originalPlist, key, value)
+                if key != "" && value != "" {
+                    originalPlist := fmt.Sprintf("$HOME/Library/Preferences/%s", oldPlist[14:])
+                    command := fmt.Sprintf("defaults write %s %s %s", originalPlist, key, value)
 
-                fmt.Println(command)
+                    if verbose {
+                        fmt.Println("")
+                        fmt.Println(originalPlist)
+                    }
+                    fmt.Println(command)
+                    if verbose {
+                        fmt.Println(string(out))
+                    }
+
+                    newSettings[key] = command
+                }
             }
         }
     }

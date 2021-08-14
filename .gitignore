@@ -16,3 +16,6 @@
 
 # JetBrains
 .idea
+
+# Output files of plist
+macos.sh
