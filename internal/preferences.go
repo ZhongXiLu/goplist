@@ -18,13 +18,9 @@ func SavePreferences(dirName string) (tmpDir string) {
     return tmpDir
 }
 
-// MovePreferences Move the preferences dir
-func MovePreferences(sourceDir string, targetDir string) {
-    cmd := exec.Command("rm", "-rf", targetDir)
-    if out, err := cmd.CombinedOutput(); err != nil {
-        log.Fatal(string(out))
-    }
-    cmd = exec.Command("mv", sourceDir, targetDir)
+// UpdatePreferences Update a plist file in our temporary Preferences dir.
+func UpdatePreferences(tempPrefDir string, plistFile string) {
+    cmd := exec.Command("cp", plistFile, tempPrefDir)
     if out, err := cmd.CombinedOutput(); err != nil {
         log.Fatal(string(out))
     }

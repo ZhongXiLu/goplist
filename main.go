@@ -20,10 +20,10 @@ var (
 
 func main() {
     // CLI arguments
-    flag.IntVar(&refreshRate, "r", 3, "Refresh rate (in seconds)")
+    flag.IntVar(&refreshRate, "r", 1, "Refresh rate (in seconds)")
     flag.BoolVar(&verbose, "v", false, "Verbose mode (print some extra information)")
     flag.BoolVar(&quiet, "q", false, "Quiet mode (dont print anything)")
-    flag.StringVar(&outputFile, "o", "macos.sh", "Output file with the commands for settings the preferences")
+    flag.StringVar(&outputFile, "o", "macos.sh", "Output file with the commands for setting the preferences")
     flag.Parse()
 
     // Logging
@@ -47,10 +47,9 @@ func main() {
 
     // Diff settings every x seconds and look for changes in the plist files
     // If any are found, convert them to bash commands and save them in `newSettings`
-    oldPrefs := internal.SavePreferences("oldPrefs")
+    prefs := internal.SavePreferences("prefs")
     for range time.Tick(time.Duration(refreshRate) * time.Second) {
-        newPrefs := internal.SavePreferences("newPrefs")
-        internal.DiffPreferences(oldPrefs, newPrefs, newSettings, verbose)
-        internal.MovePreferences(newPrefs, oldPrefs)
+        internal.DiffPreferences(prefs, "$HOME/Library/Preferences/", newSettings)
+        prefs = internal.SavePreferences("prefs")
     }
 }
