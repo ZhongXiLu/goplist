@@ -33,6 +33,7 @@ func main() {
         log.SetLevel(log.ErrorLevel)
     }
 
+    prefs := internal.SavePreferences("prefs")
     newSettings := make(map[string]string)
 
     // Write settings to file on program exit (ctrl + c)
@@ -41,13 +42,12 @@ func main() {
     go func() {
         <-c
         internal.WritePreferencesToFile(outputFile, newSettings)
-        // TODO: rm -rf prefs dirs
+        internal.DeletePreferences(prefs)
         os.Exit(0)
     }()
 
     // Diff settings every x seconds and look for changes in the plist files
     // If any are found, convert them to bash commands and save them in `newSettings`
-    prefs := internal.SavePreferences("prefs")
     for range time.Tick(time.Duration(refreshRate) * time.Second) {
         internal.DiffPreferences(prefs, "$HOME/Library/Preferences/", newSettings)
         prefs = internal.SavePreferences("prefs")

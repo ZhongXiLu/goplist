@@ -26,6 +26,15 @@ func UpdatePreferences(tempPrefDir string, plistFile string) {
     }
 }
 
+// DeletePreferences Delete the temporary Preferences dir
+func DeletePreferences(prefDir string) {
+    cmd := exec.Command("rm", "-rf", prefDir)
+    if out, err := cmd.CombinedOutput(); err != nil {
+        log.Fatal(string(out))
+    }
+}
+
+
 // WritePreferencesToFile Write preferences to a file.
 func WritePreferencesToFile(fileName string, settings map[string]string) {
     // overwrite if file already exists

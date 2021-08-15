@@ -81,7 +81,7 @@ func diffPlistFile(oldPlist string, newPlist string, newSettings map[string]stri
                     // -       <false/>
                     // +       <true/>
                     key = getValueOfTag(lines[index-2])
-                }
+                } // TODO: there might be other cases with nested xml tags...
                 value := getValueOfTag(diff)
 
                 if key != "" && value != "" {
