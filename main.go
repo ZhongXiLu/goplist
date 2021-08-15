@@ -7,6 +7,7 @@ import (
     "syscall"
     "time"
 
+    log "github.com/sirupsen/logrus"
     "github.com/zhongxilu/plist/internal"
 )
 
@@ -14,14 +15,23 @@ var (
     refreshRate int
     verbose     bool
     outputFile  string
+    quiet       bool
 )
 
 func main() {
     // CLI arguments
     flag.IntVar(&refreshRate, "r", 3, "Refresh rate (in seconds)")
-    flag.BoolVar(&verbose, "v", false, "Verbose mode")
+    flag.BoolVar(&verbose, "v", false, "Verbose mode (print some extra information)")
+    flag.BoolVar(&quiet, "q", false, "Quiet mode (dont print anything)")
     flag.StringVar(&outputFile, "o", "macos.sh", "Output file with the commands for settings the preferences")
     flag.Parse()
+
+    // Logging
+    if verbose {
+        log.SetLevel(log.DebugLevel)
+    } else if quiet {
+        log.SetLevel(log.ErrorLevel)
+    }
 
     newSettings := make(map[string]string)
 

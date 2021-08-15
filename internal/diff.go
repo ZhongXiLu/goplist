@@ -2,10 +2,11 @@ package internal
 
 import (
     "fmt"
-    "log"
     "os/exec"
     "regexp"
     "strings"
+
+    log "github.com/sirupsen/logrus"
 )
 
 // Plist files we should ignore
@@ -36,7 +37,7 @@ func getValueOfTag(line string, verbose bool) string {
             return matches[1]
         } else {
             if verbose {
-                log.Println("Could not parse %s", line)
+                log.Debug("Could not parse %s", line)
             }
         }
     }
@@ -89,14 +90,10 @@ func diffPlistFile(oldPlist string, newPlist string, newSettings map[string]stri
                     originalPlist := fmt.Sprintf("$HOME/Library/Preferences/%s", oldPlist[14:])
                     command := fmt.Sprintf("defaults write %s %s %s", originalPlist, key, value)
 
-                    if verbose {
-                        fmt.Println("")
-                        fmt.Println(originalPlist)
-                    }
-                    fmt.Println(command)
-                    if verbose {
-                        fmt.Println(string(out))
-                    }
+                    log.Debug("")
+                    log.Debug(originalPlist)
+                    log.Info(command)
+                    log.Debug(string(out))
 
                     newSettings[key] = command
                 }
