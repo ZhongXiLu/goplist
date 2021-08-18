@@ -1,4 +1,4 @@
-module github.com/zhongxilu/plist
+module github.com/zhongxilu/goplist
 
 go 1.16
 

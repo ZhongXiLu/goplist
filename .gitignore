@@ -17,5 +17,5 @@
 # JetBrains
 .idea
 
-# Output files of plist
+# Output files of goplist
 macos.sh

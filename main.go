@@ -9,7 +9,7 @@ import (
 
     log "github.com/sirupsen/logrus"
     "github.com/spf13/viper"
-    "github.com/zhongxilu/plist/internal"
+    "github.com/zhongxilu/goplist/internal"
 )
 
 var (
