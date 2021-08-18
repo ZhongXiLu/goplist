@@ -2,10 +2,11 @@ package internal
 
 import (
     "bufio"
-    "github.com/stretchr/testify/assert"
     "os"
     "os/exec"
     "testing"
+
+    "github.com/stretchr/testify/assert"
 )
 
 func TestDeletePreferences(t *testing.T) {
@@ -25,7 +26,7 @@ func TestDeletePreferences(t *testing.T) {
 }
 
 func TestSavePreferences(t *testing.T) {
-    prefDir := SavePreferences("test")
+    prefDir := SavePreferences("/tmp/test")
     assert.Equal(t, "/tmp/test", prefDir)
 
     cmd := exec.Command("/bin/bash", "-c", "[ -d /tmp/test ]")

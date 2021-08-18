@@ -8,6 +8,7 @@ import (
     "time"
 
     log "github.com/sirupsen/logrus"
+    "github.com/spf13/viper"
     "github.com/zhongxilu/plist/internal"
 )
 
@@ -17,6 +18,11 @@ var (
     outputFile  string
     quiet       bool
 )
+
+func init() {
+    viper.SetDefault("PreferencesDir", "$HOME/Library/Preferences")
+    viper.SetDefault("TmpPreferencesDir", "/tmp/prefs")
+}
 
 func main() {
     // CLI arguments
@@ -33,7 +39,7 @@ func main() {
         log.SetLevel(log.ErrorLevel)
     }
 
-    prefs := internal.SavePreferences("prefs")
+    prefs := internal.SavePreferences(viper.GetString("TmpPreferencesDir"))
     newSettings := make(map[string]string)
 
     // Write settings to file on program exit (ctrl + c)
@@ -49,7 +55,7 @@ func main() {
     // Diff settings every x seconds and look for changes in the plist files
     // If any are found, convert them to bash commands and save them in `newSettings`
     for range time.Tick(time.Duration(refreshRate) * time.Second) {
-        internal.DiffPreferences(prefs, "$HOME/Library/Preferences/", newSettings)
-        prefs = internal.SavePreferences("prefs")
+        internal.DiffPreferences(prefs, viper.GetString("PreferencesDir") + "/", newSettings)
+        prefs = internal.SavePreferences(viper.GetString("TmpPreferencesDir"))
     }
 }

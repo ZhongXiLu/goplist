@@ -2,20 +2,22 @@ package internal
 
 import (
     "fmt"
+    "github.com/spf13/viper"
     "os"
     "os/exec"
 
     log "github.com/sirupsen/logrus"
 )
 
-// SavePreferences Save the current preferences (located at $HOME/Library/Preferences) to the /tmp dir.
+// SavePreferences Save the current preferences (located at $HOME/Library/Preferences) to a directory.
 func SavePreferences(dirName string) (tmpDir string) {
-    tmpDir = "/tmp/" + dirName
-    cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -r $HOME/Library/Preferences/. %s", tmpDir))
+    cmd := exec.Command("/bin/bash", "-c",
+        fmt.Sprintf("cp -r %s/. %s", viper.GetString("PreferencesDir"), dirName),
+    )
     if out, err := cmd.CombinedOutput(); err != nil {
         log.Fatal(string(out))
     }
-    return tmpDir
+    return dirName
 }
 
 // UpdatePreferences Update a plist file in our temporary Preferences dir.
@@ -33,7 +35,6 @@ func DeletePreferences(prefDir string) {
         log.Fatal(string(out))
     }
 }
-
 
 // WritePreferencesToFile Write preferences to a file.
 func WritePreferencesToFile(fileName string, settings map[string]string) {

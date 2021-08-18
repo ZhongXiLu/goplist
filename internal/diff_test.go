@@ -1,6 +1,7 @@
 package internal
 
 import (
+    "github.com/spf13/viper"
     "os/exec"
     "testing"
 
@@ -42,6 +43,8 @@ func Test_getTagName_invalidTag(t *testing.T) {
 }
 
 func Test_diffPlistFile_valueChanged(t *testing.T) {
+    viper.SetDefault("PreferencesDir", "$HOME/Library/Preferences")
+    viper.SetDefault("TmpPreferencesDir", "testdata/old")
     settingsMap := make(map[string]string)
     diffPlistFile(
         "testdata/old/.GlobalPreferences.plist.valueChanged",
@@ -50,13 +53,14 @@ func Test_diffPlistFile_valueChanged(t *testing.T) {
     )
     assert.Contains(t, settingsMap, "_HIHideMenuBar")
     assert.Equal(t,
-        // TODO: Small "bug": the length of the prefix is hardcoded now ("tmp/prefs/")
-        "defaults write $HOME/Library/Preferences/d/.GlobalPreferences.plist.valueChanged \"_HIHideMenuBar\" \"false\"",
+        "defaults write $HOME/Library/Preferences/.GlobalPreferences.plist.valueChanged \"_HIHideMenuBar\" \"false\"",
         settingsMap["_HIHideMenuBar"],
     )
 }
 
 func Test_diffPlistFile_valueAdded(t *testing.T) {
+    viper.SetDefault("PreferencesDir", "$HOME/Library/Preferences")
+    viper.SetDefault("TmpPreferencesDir", "testdata/old")
     settingsMap := make(map[string]string)
     diffPlistFile(
         "testdata/old/.GlobalPreferences.plist.valueAdded",
@@ -65,8 +69,7 @@ func Test_diffPlistFile_valueAdded(t *testing.T) {
     )
     assert.Contains(t, settingsMap, "AppleFontSmoothing")
     assert.Equal(t,
-        // TODO: Small "bug": the length of the prefix is hardcoded now ("tmp/prefs/")
-        "defaults write $HOME/Library/Preferences/d/.GlobalPreferences.plist.valueAdded \"AppleFontSmoothing\" \"AppleInterfaceStyle\"",
+        "defaults write $HOME/Library/Preferences/.GlobalPreferences.plist.valueAdded \"AppleFontSmoothing\" \"AppleInterfaceStyle\"",
         settingsMap["AppleFontSmoothing"],
     )
 }
@@ -79,6 +82,8 @@ func Test_diffPlistFile_plistDoesNotExist(t *testing.T) {
 
 
 func TestDiffPreferences_valueChanged(t *testing.T) {
+    viper.SetDefault("PreferencesDir", "$HOME/Library/Preferences")
+    viper.SetDefault("TmpPreferencesDir", "testdata/old_tmp")
     // Setup plist dirs so we dont modify initial test data
     cmd := exec.Command("cp", "-r", "testdata/old/.", "testdata/old_tmp")
     if out, err := cmd.CombinedOutput(); err != nil {
@@ -93,14 +98,12 @@ func TestDiffPreferences_valueChanged(t *testing.T) {
     DiffPreferences("testdata/old_tmp/", "testdata/new_tmp/", settingsMap)
     assert.Contains(t, settingsMap, "_HIHideMenuBar")
     assert.Equal(t,
-        // TODO: Small "bug": the length of the prefix is hardcoded now ("tmp/prefs/")
-        "defaults write $HOME/Library/Preferences/d_tmp/.GlobalPreferences.plist.valueChanged \"_HIHideMenuBar\" \"false\"",
+        "defaults write $HOME/Library/Preferences/.GlobalPreferences.plist.valueChanged \"_HIHideMenuBar\" \"false\"",
         settingsMap["_HIHideMenuBar"],
     )
     assert.Contains(t, settingsMap, "AppleFontSmoothing")
     assert.Equal(t,
-        // TODO: Small "bug": the length of the prefix is hardcoded now ("tmp/prefs/")
-        "defaults write $HOME/Library/Preferences/d_tmp/.GlobalPreferences.plist.valueAdded \"AppleFontSmoothing\" \"AppleInterfaceStyle\"",
+        "defaults write $HOME/Library/Preferences/.GlobalPreferences.plist.valueAdded \"AppleFontSmoothing\" \"AppleInterfaceStyle\"",
         settingsMap["AppleFontSmoothing"],
     )
 

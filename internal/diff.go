@@ -2,6 +2,7 @@ package internal
 
 import (
     "fmt"
+    "github.com/spf13/viper"
     "os/exec"
     "regexp"
     "strings"
@@ -86,7 +87,8 @@ func diffPlistFile(oldPlist string, newPlist string, newSettings map[string]stri
                 value := getValueOfTag(diff)
 
                 if key != "" && value != "" {
-                    originalPlist := fmt.Sprintf("$HOME/Library/Preferences/%s", oldPlist[11:])
+                    plistFileName := oldPlist[len(viper.GetString("TmpPreferencesDir"))+1:]
+                    originalPlist := fmt.Sprintf("%s/%s", viper.GetString("PreferencesDir"), plistFileName)
                     command := fmt.Sprintf("defaults write %s \"%s\" \"%s\"", originalPlist, key, value)
 
                     log.Debug("")
@@ -112,8 +114,9 @@ func DiffPreferences(oldPrefs string, newPrefs string, newSettings map[string]st
                 fields := strings.Fields(diff)
                 oldPlist := fields[2]
                 newPlist := fields[4]
-                // Remove the prefix "/tmp/oldPrefs/" and subsequent subdirs
-                if _, ok := blackList[strings.Split(oldPlist[11:], "/")[0]]; !ok {
+                // Remove the prefix "/tmp/prefs/" and subsequent subdirs
+                plistFileName := strings.Split(oldPlist[len(viper.GetString("TmpPreferencesDir"))+1:], "/")[0]
+                if _, ok := blackList[plistFileName]; !ok {
                     diffPlistFile(oldPlist, newPlist, newSettings)
                     UpdatePreferences(oldPrefs, newPlist)
                 }
