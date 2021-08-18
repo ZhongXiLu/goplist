@@ -16,6 +16,7 @@ var blackList = map[string]struct{}{
     "com.apple.spaces.plist":            {},
     "jetbrains.jetprofile.asset.plist":  {},
     "com.apple.studentd.plist":          {},
+    "com.apple.remindd.plist":           {},
 }
 
 // Get the bash command that outputs the equivalent xml representation of a plist file.
@@ -36,7 +37,7 @@ func getValueOfTag(line string) string {
         if len(matches) == 2 {
             return matches[1]
         } else {
-            log.Debug("Could not parse %s", line)
+            log.Debugf("Could not parse %s", line)
         }
     }
     return ""
@@ -74,7 +75,7 @@ func diffPlistFile(oldPlist string, newPlist string, newSettings map[string]stri
                     // name of key is located one line before
                     // +       <key>AppleInterfaceStyle</key>
                     // +       <string>Dark</string>
-                    key = getValueOfTag(lines[index-2])
+                    key = getValueOfTag(lines[index-1])
                 } else {
                     // name of key is located two lines before
                     //         <key>autohide</key>
@@ -86,7 +87,7 @@ func diffPlistFile(oldPlist string, newPlist string, newSettings map[string]stri
 
                 if key != "" && value != "" {
                     originalPlist := fmt.Sprintf("$HOME/Library/Preferences/%s", oldPlist[11:])
-                    command := fmt.Sprintf("defaults write %s %s %s", originalPlist, key, value)
+                    command := fmt.Sprintf("defaults write %s \"%s\" \"%s\"", originalPlist, key, value)
 
                     log.Debug("")
                     log.Debug(originalPlist)
