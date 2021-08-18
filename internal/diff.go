@@ -2,12 +2,12 @@ package internal
 
 import (
     "fmt"
-    "github.com/spf13/viper"
     "os/exec"
     "regexp"
     "strings"
 
     log "github.com/sirupsen/logrus"
+    "github.com/spf13/viper"
 )
 
 // Plist files we should ignore

@@ -2,10 +2,10 @@ package internal
 
 import (
     "fmt"
-    "github.com/spf13/viper"
     "os"
     "os/exec"
 
+    "github.com/spf13/viper"
     log "github.com/sirupsen/logrus"
 )
 

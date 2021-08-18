@@ -1,10 +1,10 @@
 package internal
 
 import (
-    "github.com/spf13/viper"
     "os/exec"
     "testing"
 
+    "github.com/spf13/viper"
     "github.com/stretchr/testify/assert"
 )
 
@@ -79,7 +79,6 @@ func Test_diffPlistFile_plistDoesNotExist(t *testing.T) {
     diffPlistFile("nonexistent.plist", "nonexistent.plist", settingsMap)
     assert.Empty(t, settingsMap)
 }
-
 
 func TestDiffPreferences_valueChanged(t *testing.T) {
     viper.SetDefault("PreferencesDir", "$HOME/Library/Preferences")
