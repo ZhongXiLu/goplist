@@ -16,7 +16,10 @@ jobs:
         go-version: 1.16
     - name: Install
       run: go install
+    - name: chmod +x
+      run: chmod +x /Users/runner/go/bin/goplist
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "$GOPATH/bin/goplist"
+        artifacts: "/Users/runner/go/bin/goplist"
+        omitBody: true
         token: ${{ secrets.GITHUB_TOKEN }}
