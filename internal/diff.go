@@ -4,6 +4,7 @@ import (
     "fmt"
     "os/exec"
     "regexp"
+    "strconv"
     "strings"
 
     log "github.com/sirupsen/logrus"
@@ -91,7 +92,21 @@ func diffPlistFile(oldPlist string, newPlist string, newSettings map[string]stri
                 if key != "" && value != "" {
                     plistFileName := oldPlist[len(viper.GetString("TmpPreferencesDir"))+1:]
                     originalPlist := fmt.Sprintf("%s/%s", viper.GetString("PreferencesDir"), plistFileName)
-                    command := fmt.Sprintf("defaults write %s \"%s\" \"%s\"", originalPlist, key, value)
+
+                    typeOfValue := ""   // default is string
+                    if _, err := strconv.ParseBool(value); err == nil {
+                        typeOfValue = " -bool"
+                    } else if _, err := strconv.Atoi(value); err == nil {
+                        if strings.Contains(value, ".") {
+                            typeOfValue = " -float"
+                        } else {
+                            typeOfValue = " -int"
+                        }
+                    }
+
+                    command := fmt.Sprintf(
+                        "defaults write %s \"%s\"%s \"%s\"", originalPlist, key, typeOfValue, value,
+                    )
 
                     log.Debug("")
                     log.Debug(originalPlist)

@@ -53,7 +53,7 @@ func Test_diffPlistFile_valueChanged(t *testing.T) {
     )
     assert.Contains(t, settingsMap, "_HIHideMenuBar")
     assert.Equal(t,
-        "defaults write $HOME/Library/Preferences/.GlobalPreferences.plist.valueChanged \"_HIHideMenuBar\" \"false\"",
+        "defaults write $HOME/Library/Preferences/.GlobalPreferences.plist.valueChanged \"_HIHideMenuBar\" -bool \"false\"",
         settingsMap["_HIHideMenuBar"],
     )
 }
@@ -97,7 +97,7 @@ func TestDiffPreferences_valueChanged(t *testing.T) {
     DiffPreferences("testdata/old_tmp/", "testdata/new_tmp/", settingsMap)
     assert.Contains(t, settingsMap, "_HIHideMenuBar")
     assert.Equal(t,
-        "defaults write $HOME/Library/Preferences/.GlobalPreferences.plist.valueChanged \"_HIHideMenuBar\" \"false\"",
+        "defaults write $HOME/Library/Preferences/.GlobalPreferences.plist.valueChanged \"_HIHideMenuBar\" -bool \"false\"",
         settingsMap["_HIHideMenuBar"],
     )
     assert.Contains(t, settingsMap, "AppleFontSmoothing")
