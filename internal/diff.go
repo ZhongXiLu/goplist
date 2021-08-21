@@ -13,9 +13,11 @@ import (
 // Plist files we should ignore
 var blackList = map[string]struct{}{
     "ByHost":                            {},
+    "jetbrains.jetprofile.asset.plist":  {},
+    "com.cisco.anyconnect.gui.plist":    {},
+    "com.apple.AddressBook.plist":       {},
     "com.apple.systempreferences.plist": {},
     "com.apple.spaces.plist":            {},
-    "jetbrains.jetprofile.asset.plist":  {},
     "com.apple.studentd.plist":          {},
     "com.apple.remindd.plist":           {},
 }
